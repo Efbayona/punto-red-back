@@ -1,0 +1,33 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /app
+  compression:
+    enabled: true
+    min-response-size: 1024
+    mime-types: application/json,application/xml
+spring:
+  datasource:
+    username: postgres
+    password: 123456
+    url:  jdbc:postgresql://localhost:5432/punto-red
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        hbm2ddl:
+          charset_name: UTF-8
+          import_files:
+springdoc:
+  swagger-ui:
+    enabled: true
+  api-docs:
+    enabled: true
+settings:
+  application:
+    name: punto-red
