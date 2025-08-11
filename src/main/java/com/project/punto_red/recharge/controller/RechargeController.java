@@ -2,6 +2,7 @@ package com.project.punto_red.recharge.controller;
 
 import com.project.punto_red.recharge.dto.RechargeHistoryResponse;
 import com.project.punto_red.recharge.dto.RechargeRequest;
+import com.project.punto_red.recharge.dto.RechargeResponse;
 import com.project.punto_red.recharge.service.RechargeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,7 +30,7 @@ public class RechargeController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "CANT NOT RECHARGE")
     })
-    public ResponseEntity<HttpStatus> recharge(@Valid @RequestBody RechargeRequest request) {
+    public ResponseEntity<RechargeResponse> recharge(@Valid @RequestBody RechargeRequest request) {
         return new ResponseEntity<>(rechargeService.recharge(request), HttpStatus.OK);
     }
 

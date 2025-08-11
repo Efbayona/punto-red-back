@@ -61,7 +61,7 @@ public class AuthServiceImpl implements AuthService {
 
         } catch (Exception e) {
             log.error("Error en login", e);
-            throw new AuthenticationFailedException("Error en login");
+            throw new AuthenticationFailedException("Credenciales incorrectas");
         }
     }
 }

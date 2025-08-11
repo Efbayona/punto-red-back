@@ -5,11 +5,11 @@ import com.google.gson.JsonObject;
 import com.project.punto_red.common.util.TokenStorage;
 import com.project.punto_red.recharge.dto.RechargeHistoryResponse;
 import com.project.punto_red.recharge.dto.RechargeRequest;
+import com.project.punto_red.recharge.dto.RechargeResponse;
 import com.project.punto_red.recharge.entity.Recharge;
 import com.project.punto_red.recharge.repository.RechargeRepository;
 import com.project.punto_red.recharge.service.RechargeService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -33,7 +33,7 @@ public class RechargeServiceImpl implements RechargeService {
     }
 
     @Override
-    public HttpStatus recharge(RechargeRequest request) {
+    public RechargeResponse recharge(RechargeRequest request) {
 
         Gson gson = new Gson();
 
@@ -66,11 +66,8 @@ public class RechargeServiceImpl implements RechargeService {
                 String cellPhone = jsonObject.get("cellPhone").getAsString();
                 Double value = jsonObject.get("value").getAsDouble();
 
-                rechargeRepository.save(Recharge.create(message, transactionalID, cellPhone, value , request.getSupplierId()));
+                return RechargeResponse.create(rechargeRepository.save(Recharge.create(message, transactionalID, cellPhone, value, request.getSupplierId())));
 
-            } else {
-                log.warn("Error en recarga: {}", response.body());
-                return HttpStatus.BAD_REQUEST;
             }
 
         } catch (Exception e) {
