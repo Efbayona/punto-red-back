@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import com.project.punto_red.auth.dto.LoginRequest;
 import com.project.punto_red.auth.dto.LoginResponse;
 import com.project.punto_red.auth.service.AuthService;
+import com.project.punto_red.common.exception.service.AuthenticationFailedException;
 import com.project.punto_red.common.util.TokenStorage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -54,11 +55,13 @@ public class AuthServiceImpl implements AuthService {
                 String token = jsonObject.get("token").getAsString();
                 tokenStorage.setToken(token);
                 return gson.fromJson(response.body(), LoginResponse.class);
+            } else {
+                throw new AuthenticationFailedException("Credenciales de authenticacion incorrectas");
             }
+
         } catch (Exception e) {
             log.error("Error en login", e);
+            throw new AuthenticationFailedException("Error en login");
         }
-
-        return null;
     }
 }

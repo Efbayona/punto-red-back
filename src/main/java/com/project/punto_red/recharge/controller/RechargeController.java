@@ -1,5 +1,6 @@
 package com.project.punto_red.recharge.controller;
 
+import com.project.punto_red.recharge.dto.RechargeHistoryResponse;
 import com.project.punto_red.recharge.dto.RechargeRequest;
 import com.project.punto_red.recharge.service.RechargeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,10 +9,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/recharge")
@@ -32,6 +32,17 @@ public class RechargeController {
     public ResponseEntity<HttpStatus> recharge(@Valid @RequestBody RechargeRequest request) {
         return new ResponseEntity<>(rechargeService.recharge(request), HttpStatus.OK);
     }
+
+    @GetMapping("/history")
+    @Operation(description = "History recharge")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "CANT NOT GET RECHARGES")
+    })
+    public ResponseEntity<List<RechargeHistoryResponse>> historyRecharge() {
+        return new ResponseEntity<>(rechargeService.getRechargeRequests(), HttpStatus.OK);
+    }
+
 
 }
 

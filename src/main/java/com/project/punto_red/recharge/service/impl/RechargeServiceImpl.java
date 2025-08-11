@@ -3,6 +3,7 @@ package com.project.punto_red.recharge.service.impl;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.project.punto_red.common.util.TokenStorage;
+import com.project.punto_red.recharge.dto.RechargeHistoryResponse;
 import com.project.punto_red.recharge.dto.RechargeRequest;
 import com.project.punto_red.recharge.entity.Recharge;
 import com.project.punto_red.recharge.repository.RechargeRepository;
@@ -16,6 +17,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -64,7 +66,7 @@ public class RechargeServiceImpl implements RechargeService {
                 String cellPhone = jsonObject.get("cellPhone").getAsString();
                 Double value = jsonObject.get("value").getAsDouble();
 
-                rechargeRepository.save(Recharge.create(message, transactionalID, cellPhone, value));
+                rechargeRepository.save(Recharge.create(message, transactionalID, cellPhone, value , request.getSupplierId()));
 
             } else {
                 log.warn("Error en recarga: {}", response.body());
@@ -76,5 +78,10 @@ public class RechargeServiceImpl implements RechargeService {
         }
 
         return null;
+    }
+
+    @Override
+    public List<RechargeHistoryResponse> getRechargeRequests() {
+        return rechargeRepository.getRechargeRequests();
     }
 }
