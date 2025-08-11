@@ -6,5 +6,4 @@ import com.project.punto_red.auth.dto.LoginResponse;
 public interface AuthService {
 
     LoginResponse login(LoginRequest request);
-
 }

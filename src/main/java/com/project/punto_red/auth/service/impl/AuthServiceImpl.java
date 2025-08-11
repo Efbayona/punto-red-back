@@ -1,9 +1,12 @@
 package com.project.punto_red.auth.service.impl;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.project.punto_red.auth.dto.LoginRequest;
 import com.project.punto_red.auth.dto.LoginResponse;
 import com.project.punto_red.auth.service.AuthService;
+import com.project.punto_red.common.util.TokenStorage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +21,11 @@ import java.time.Duration;
 public class AuthServiceImpl implements AuthService {
 
     private final Gson gson = new Gson();
+    private final TokenStorage tokenStorage;
+
+    public AuthServiceImpl(TokenStorage tokenStorage) {
+        this.tokenStorage = tokenStorage;
+    }
 
     @Override
     public LoginResponse login(LoginRequest request) {
@@ -35,20 +43,20 @@ public class AuthServiceImpl implements AuthService {
                     .uri(URI.create(loginUrl))
                     .timeout(Duration.ofSeconds(10))
                     .header("Content-Type", "application/json")
+                    .header("x-api-key", "mtrQF6Q11eosqyQnkMY0JGFbGqcxVg5icvfVnX1ifIyWDvwGApJ8WUM8nHVrdSkN")
                     .POST(HttpRequest.BodyPublishers.ofString(jsonLogin))
                     .build();
 
             HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
-                String body = response.body();
-                log.info("Login response body: {}", body);
-
-                return gson.fromJson(body, LoginResponse.class);
-
+                JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
+                String token = jsonObject.get("token").getAsString();
+                tokenStorage.setToken(token);
+                return gson.fromJson(response.body(), LoginResponse.class);
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error("Error en login", e);
         }
 
         return null;

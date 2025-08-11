@@ -24,7 +24,7 @@ public class AuthController {
         this.authService = authService;
     }
 
-   @PostMapping("")
+   @PostMapping("/")
    @Operation(description = "Login Of Users")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
