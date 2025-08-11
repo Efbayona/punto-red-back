@@ -1,6 +1,7 @@
 package com.project.punto_red.recharge.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.project.punto_red.common.validation.annotation.ValidatorPhone;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -11,6 +12,7 @@ public class RechargeRequest implements Serializable {
     @JsonProperty(value = "supplierId", required = true)
     private String supplierId;
 
+    @ValidatorPhone
     @JsonProperty(value = "cellPhone", required = true)
     private String cellPhone;
 
