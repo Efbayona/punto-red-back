@@ -1,5 +1,6 @@
 package com.project.punto_red.auth.controller;
 
+import com.project.punto_red.auth.dto.CreateUserRequest;
 import com.project.punto_red.auth.dto.LoginRequest;
 import com.project.punto_red.auth.dto.LoginResponse;
 import com.project.punto_red.auth.service.AuthService;
@@ -33,5 +34,15 @@ public class AuthController {
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         return new ResponseEntity<>(authService.login(request), HttpStatus.OK);
     }
+
+//    @PostMapping("register")
+//    @Operation(description = "Login Of Users")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "OK"),
+//            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED")
+//    })
+//    public ResponseEntity<LoginResponse> registerUser(@Valid @RequestBody CreateUserRequest request) {
+//        return new ResponseEntity<>(authService.registerUser(request), HttpStatus.OK);
+//    }
 
 }

@@ -10,6 +10,7 @@ import com.project.punto_red.recharge.entity.Recharge;
 import com.project.punto_red.recharge.repository.RechargeRepository;
 import com.project.punto_red.recharge.service.RechargeService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -23,6 +24,9 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class RechargeServiceImpl implements RechargeService {
+
+    @Value("${settings.request.url}")
+    private String baseUrl;
 
     private final TokenStorage tokenStorage;
     private final RechargeRepository rechargeRepository;
@@ -47,12 +51,15 @@ public class RechargeServiceImpl implements RechargeService {
 
             String json = gson.toJson(request);
 
-            String baseUrl = "https://us-central1-puntored-dev.cloudfunctions.net/technicalTest-developer/api";
             String operatorsUrl = baseUrl + "/buy";
 
             HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
 
-            HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(operatorsUrl)).timeout(Duration.ofSeconds(10)).header("Content-Type", "application/json").header("Authorization", token).POST(HttpRequest.BodyPublishers.ofString(json)).build();
+            HttpRequest httpRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(operatorsUrl))
+                    .timeout(Duration.ofSeconds(10))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", token).POST(HttpRequest.BodyPublishers.ofString(json)).build();
 
             HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 

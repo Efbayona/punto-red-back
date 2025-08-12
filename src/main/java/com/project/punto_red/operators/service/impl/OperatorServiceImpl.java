@@ -3,6 +3,7 @@ package com.project.punto_red.operators.service.impl;
 import com.project.punto_red.common.util.TokenStorage;
 import com.project.punto_red.operators.service.OperatorService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -15,6 +16,8 @@ import java.time.Duration;
 @Slf4j
 public class OperatorServiceImpl implements OperatorService {
 
+    @Value("${settings.request.url}")
+    private String baseUrl;
     private final TokenStorage tokenStorage;
 
     public OperatorServiceImpl(TokenStorage tokenStorage) {
@@ -31,7 +34,6 @@ public class OperatorServiceImpl implements OperatorService {
                 return null;
             }
 
-            String baseUrl = "https://us-central1-puntored-dev.cloudfunctions.net/technicalTest-developer/api";
             String operatorsUrl = baseUrl + "/getSuppliers";
 
             HttpClient client = HttpClient.newBuilder()

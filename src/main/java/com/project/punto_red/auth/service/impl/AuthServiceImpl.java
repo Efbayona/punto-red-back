@@ -3,6 +3,7 @@ package com.project.punto_red.auth.service.impl;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.project.punto_red.auth.dto.CreateUserRequest;
 import com.project.punto_red.auth.dto.LoginRequest;
 import com.project.punto_red.auth.dto.LoginResponse;
 import com.project.punto_red.auth.service.AuthService;
@@ -12,6 +13,7 @@ import com.project.punto_red.security.jwt.JwtTokenProvider;
 import com.project.punto_red.user.entity.User;
 import com.project.punto_red.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,9 +28,13 @@ import java.time.Duration;
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 
-    private final Gson gson = new Gson();
-    private final TokenStorage tokenStorage;
+    @Value("${settings.request.url}")
+    private String baseUrl;
 
+    @Value("${settings.request.key}")
+    private String key;
+
+    private final TokenStorage tokenStorage;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
@@ -42,13 +48,57 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse login(LoginRequest request) {
-        User user = userRepository.getUserByUserName(request.getUser()).orElseThrow(()-> new UsernameNotFoundException("credenciales incorrectas"));
+        User user = userRepository.getUserByUserName(request.getUser()).orElseThrow(() -> new UsernameNotFoundException("credenciales incorrectas"));
 
-        if (!passwordEncoder.matches(request.getPassword(),user.getPassword())){
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new UsernameNotFoundException("credenciales incorrectas");
         }
+
+        requestService();
 
         return new LoginResponse(jwtTokenProvider.generateToken(request.getUser()));
 
     }
+
+    @Override
+    public LoginResponse register(CreateUserRequest request) {
+        return null;
+    }
+
+    public void requestService() {
+        Gson gson = new Gson();
+
+        String jsonLogin = "{ \"user\": \"user0147\", \"password\": \"#3Q34Sh0NlDS\" }";
+
+        try {
+            String loginUrl = baseUrl + "/auth";
+
+            HttpClient client = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(10))
+                    .build();
+
+            HttpRequest httpRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(loginUrl))
+                    .timeout(Duration.ofSeconds(10))
+                    .header("Content-Type", "application/json")
+                    .header("x-api-key", key)
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonLogin))
+                    .build();
+
+            HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
+                String token = jsonObject.get("token").getAsString();
+                tokenStorage.setToken(token);
+            } else {
+                throw new AuthenticationFailedException("Credenciales de autenticación incorrectas");
+            }
+
+        } catch (Exception e) {
+            log.error("Error en login externo", e);
+            throw new AuthenticationFailedException("Error al autenticar contra el API externo");
+        }
+    }
+
 }

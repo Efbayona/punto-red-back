@@ -1,0 +1,1 @@
+INSERT INTO main.user(user_id,user_name,password)VALUES('a4698865-dd57-4668-bf9a-c267877c12ba', 'edwin', '$2a$12$bRmTZn2gb7JcnbgZmeI0je4A31YLR1/IAufgehu.WmU6LqqJb07DW')

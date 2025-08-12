@@ -5,12 +5,11 @@ import com.project.punto_red.recharge.entity.Recharge;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 public interface RechargeRepository extends JpaRepository<Recharge, UUID> {
-    @Query("Select new com.project.punto_red.recharge.dto.RechargeHistoryResponse(r.message, r.cellPhone , r.value, r.supplierId, r.createdAt) from Recharge r")
+    @Query("Select new com.project.punto_red.recharge.dto.RechargeHistoryResponse(r.message, r.cellPhone , r.value, r.transactionalID, r.supplierId, r.createdAt) from Recharge r")
     List<RechargeHistoryResponse> getRechargeRequests();
 
 }
