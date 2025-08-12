@@ -1,6 +1,7 @@
 package com.project.punto_red.common.exception.controller;
 
 import com.project.punto_red.common.exception.service.AuthenticationFailedException;
+import com.project.punto_red.common.exception.service.ConflictException;
 import com.project.punto_red.common.exception.service.ResourceNotFoundException;
 import com.project.punto_red.common.exception.service.ServerErrorException;
 import lombok.extern.slf4j.Slf4j;
@@ -70,6 +71,17 @@ public class ExceptionHandlerController {
         map.put("error", "Unauthorized");
         map.put("message", ex.getMessage());
         log.warn("AuthenticationFailedException [{}]",ex.getMessage());
+        return map;
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String,String> AuthenticationException(ConflictException ex){
+        Map<String,String> map = new HashMap<>();
+        map.put("error", "Conflict");
+        map.put("message", ex.getMessage());
+        log.warn("ConflictException [{}]",ex.getMessage());
         return map;
     }
 }

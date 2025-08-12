@@ -35,14 +35,15 @@ public class AuthController {
         return new ResponseEntity<>(authService.login(request), HttpStatus.OK);
     }
 
-//    @PostMapping("register")
-//    @Operation(description = "Login Of Users")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "OK"),
-//            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED")
-//    })
-//    public ResponseEntity<LoginResponse> registerUser(@Valid @RequestBody CreateUserRequest request) {
-//        return new ResponseEntity<>(authService.registerUser(request), HttpStatus.OK);
-//    }
+    @PostMapping("/register")
+    @Operation(description = "Creation user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "CANT CREATE USER")
+    })
+    public ResponseEntity<HttpStatus> registerUser(@Valid @RequestBody CreateUserRequest request) {
+        authService.registerUser(request);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 
 }
