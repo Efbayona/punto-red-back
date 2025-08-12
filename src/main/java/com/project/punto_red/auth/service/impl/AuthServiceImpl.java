@@ -8,7 +8,12 @@ import com.project.punto_red.auth.dto.LoginResponse;
 import com.project.punto_red.auth.service.AuthService;
 import com.project.punto_red.common.exception.service.AuthenticationFailedException;
 import com.project.punto_red.common.util.TokenStorage;
+import com.project.punto_red.security.jwt.JwtTokenProvider;
+import com.project.punto_red.user.entity.User;
+import com.project.punto_red.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -24,44 +29,26 @@ public class AuthServiceImpl implements AuthService {
     private final Gson gson = new Gson();
     private final TokenStorage tokenStorage;
 
-    public AuthServiceImpl(TokenStorage tokenStorage) {
+    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
+
+    public AuthServiceImpl(TokenStorage tokenStorage, UserRepository userRepository, JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder) {
         this.tokenStorage = tokenStorage;
+        this.userRepository = userRepository;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public LoginResponse login(LoginRequest request) {
-        try {
-            String baseUrl = "https://us-central1-puntored-dev.cloudfunctions.net/technicalTest-developer/api";
-            String loginUrl = baseUrl + "/auth";
+        User user = userRepository.getUserByUserName(request.getUser()).orElseThrow(()-> new UsernameNotFoundException("credenciales incorrectas"));
 
-            String jsonLogin = gson.toJson(request);
-
-            HttpClient client = HttpClient.newBuilder()
-                    .connectTimeout(Duration.ofSeconds(10))
-                    .build();
-
-            HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(loginUrl))
-                    .timeout(Duration.ofSeconds(10))
-                    .header("Content-Type", "application/json")
-                    .header("x-api-key", "mtrQF6Q11eosqyQnkMY0JGFbGqcxVg5icvfVnX1ifIyWDvwGApJ8WUM8nHVrdSkN")
-                    .POST(HttpRequest.BodyPublishers.ofString(jsonLogin))
-                    .build();
-
-            HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 200) {
-                JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
-                String token = jsonObject.get("token").getAsString();
-                tokenStorage.setToken(token);
-                return gson.fromJson(response.body(), LoginResponse.class);
-            } else {
-                throw new AuthenticationFailedException("Credenciales de authenticacion incorrectas");
-            }
-
-        } catch (Exception e) {
-            log.error("Error en login", e);
-            throw new AuthenticationFailedException("Credenciales incorrectas");
+        if (!passwordEncoder.matches(request.getPassword(),user.getPassword())){
+            throw new UsernameNotFoundException("credenciales incorrectas");
         }
+
+        return new LoginResponse(jwtTokenProvider.generateToken(request.getUser()));
+
     }
 }

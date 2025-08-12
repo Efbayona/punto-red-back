@@ -30,4 +30,6 @@ springdoc:
     enabled: true
 settings:
   application:
-    name: punto-red
+      name: punto-red
+  auth:
+    token-time: 30
