@@ -1,5 +1,6 @@
 package com.project.punto_red.operators.service.impl;
 
+import com.project.punto_red.common.exception.service.ResourceNotFoundException;
 import com.project.punto_red.common.util.TokenStorage;
 import com.project.punto_red.operators.service.OperatorService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,13 +28,6 @@ public class OperatorServiceImpl implements OperatorService {
     @Override
     public String getOperators() {
         try {
-            String token = tokenStorage.getToken();
-
-            if (token == null || token.isEmpty()) {
-                log.warn("No se encontró un token válido en TokenStorage");
-                return null;
-            }
-
             String operatorsUrl = baseUrl + "/getSuppliers";
 
             HttpClient client = HttpClient.newBuilder()
@@ -44,7 +38,7 @@ public class OperatorServiceImpl implements OperatorService {
                     .uri(URI.create(operatorsUrl))
                     .timeout(Duration.ofSeconds(10))
                     .header("Content-Type", "application/json")
-                    .header("Authorization", token)
+                    .header("Authorization", tokenStorage.getToken())
                     .GET()
                     .build();
 
@@ -58,6 +52,6 @@ public class OperatorServiceImpl implements OperatorService {
             log.error("Error al obtener operadores", e);
         }
 
-        return null;
+        throw new ResourceNotFoundException("No es posible obtener los operadores.");
     }
 }

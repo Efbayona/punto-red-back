@@ -2,6 +2,7 @@ package com.project.punto_red.recharge.service.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.project.punto_red.common.exception.service.ServerErrorException;
 import com.project.punto_red.common.util.TokenStorage;
 import com.project.punto_red.recharge.dto.RechargeHistoryResponse;
 import com.project.punto_red.recharge.dto.RechargeRequest;
@@ -42,13 +43,6 @@ public class RechargeServiceImpl implements RechargeService {
         Gson gson = new Gson();
 
         try {
-            String token = tokenStorage.getToken();
-
-            if (token == null || token.isEmpty()) {
-                log.warn("No se encontró un token válido en TokenStorage");
-                return null;
-            }
-
             String json = gson.toJson(request);
 
             String operatorsUrl = baseUrl + "/buy";
@@ -59,7 +53,7 @@ public class RechargeServiceImpl implements RechargeService {
                     .uri(URI.create(operatorsUrl))
                     .timeout(Duration.ofSeconds(10))
                     .header("Content-Type", "application/json")
-                    .header("Authorization", token).POST(HttpRequest.BodyPublishers.ofString(json)).build();
+                    .header("Authorization", tokenStorage.getToken()).POST(HttpRequest.BodyPublishers.ofString(json)).build();
 
             HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
@@ -81,7 +75,7 @@ public class RechargeServiceImpl implements RechargeService {
             log.error("Error al obtener operadores", e);
         }
 
-        return null;
+        throw new ServerErrorException("No es posible recargar en estos momentos.");
     }
 
     @Override

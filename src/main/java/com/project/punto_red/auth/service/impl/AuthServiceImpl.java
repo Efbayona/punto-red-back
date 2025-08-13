@@ -2,24 +2,22 @@ package com.project.punto_red.auth.service.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.project.punto_red.auth.dto.CreateUserRequest;
 import com.project.punto_red.auth.dto.LoginRequest;
 import com.project.punto_red.auth.dto.LoginResponse;
 import com.project.punto_red.auth.service.AuthService;
 import com.project.punto_red.common.exception.service.AuthenticationFailedException;
 import com.project.punto_red.common.exception.service.ConflictException;
+import com.project.punto_red.common.exception.service.ServerErrorException;
 import com.project.punto_red.common.util.TokenStorage;
 import com.project.punto_red.security.jwt.JwtTokenProvider;
 import com.project.punto_red.user.entity.User;
 import com.project.punto_red.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -58,7 +56,12 @@ public class AuthServiceImpl implements AuthService {
             throw new UsernameNotFoundException("credenciales incorrectas");
         }
 
-        requestService();
+        String token = requestService();
+        if (token == null) {
+            throw new ServerErrorException("Estamos teniendo problemas, reintenta más tarde.");
+        }
+        tokenStorage.setToken(token);
+
         return new LoginResponse(jwtTokenProvider.generateToken(request.getUser()));
 
     }
@@ -67,17 +70,17 @@ public class AuthServiceImpl implements AuthService {
     public void registerUser(CreateUserRequest request) {
 
         if (userRepository.existsByUserName(request.getUserName())) {
-           throw new ConflictException("Nombre de usuario ya existe");
+            throw new ConflictException("Nombre de usuario ya existe");
         }
 
-        if(!Objects.equals(request.getPassword(), request.getConfirmPassword())){
+        if (!Objects.equals(request.getPassword(), request.getConfirmPassword())) {
             throw new IllegalArgumentException("Las contraseñas no coinciden");
         }
 
         userRepository.save(User.create(request.getUserName(), passwordEncoder.encode(request.getPassword())));
     }
 
-    public void requestService() {
+    public String requestService() {
         Gson gson = new Gson();
 
         String jsonLogin = "{ \"user\": \"user0147\", \"password\": \"#3Q34Sh0NlDS\" }";
@@ -98,18 +101,16 @@ public class AuthServiceImpl implements AuthService {
                     .build();
 
             HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 200) {
-                JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
-                String token = jsonObject.get("token").getAsString();
-                tokenStorage.setToken(token);
-            } else {
+            if (response.statusCode() != 200) {
                 throw new AuthenticationFailedException("Credenciales de autenticación incorrectas");
             }
 
+            JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
+            return jsonObject.get("token").getAsString();
+
         } catch (Exception e) {
-            log.error("Error en login externo", e);
-            throw new AuthenticationFailedException("Error al autenticar contra el API externo");
+            log.error("Error en login API Punto Red", e);
+            return null;
         }
     }
 
