@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,8 +41,8 @@ public class RechargeController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "CANT NOT GET RECHARGES")
     })
-    public ResponseEntity<List<RechargeHistoryResponse>> historyRecharge() {
-        return new ResponseEntity<>(rechargeService.getRechargeRequests(), HttpStatus.OK);
+    public ResponseEntity<Page<RechargeHistoryResponse>> historyRecharge(@RequestParam(defaultValue = "0") int page) {
+        return new ResponseEntity<>(rechargeService.getRechargeRequests(page), HttpStatus.OK);
     }
 
 

@@ -12,6 +12,9 @@ import com.project.punto_red.recharge.repository.RechargeRepository;
 import com.project.punto_red.recharge.service.RechargeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -19,7 +22,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -79,7 +81,8 @@ public class RechargeServiceImpl implements RechargeService {
     }
 
     @Override
-    public List<RechargeHistoryResponse> getRechargeRequests() {
-        return rechargeRepository.getRechargeRequests();
+    public Page<RechargeHistoryResponse> getRechargeRequests(int page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        return rechargeRepository.getRechargeRequests(pageable);
     }
 }
