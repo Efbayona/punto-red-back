@@ -45,7 +45,11 @@ public class RechargeServiceImpl implements RechargeService {
         Gson gson = new Gson();
 
         try {
-            String json = gson.toJson(request);
+            String jsonPayload = "{"
+                    + "\"supplierId\": \"" + request.getSupplierId() + "\","
+                    + "\"cellPhone\": \"" + request.getCellPhone() + "\","
+                    + "\"value\": " + request.getValue()
+                    + "}";
 
             String operatorsUrl = baseUrl + "/buy";
 
@@ -55,7 +59,7 @@ public class RechargeServiceImpl implements RechargeService {
                     .uri(URI.create(operatorsUrl))
                     .timeout(Duration.ofSeconds(10))
                     .header("Content-Type", "application/json")
-                    .header("Authorization", tokenStorage.getToken()).POST(HttpRequest.BodyPublishers.ofString(json)).build();
+                    .header("Authorization", tokenStorage.getToken()).POST(HttpRequest.BodyPublishers.ofString(jsonPayload)).build();
 
             HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
@@ -69,7 +73,7 @@ public class RechargeServiceImpl implements RechargeService {
                 String cellPhone = jsonObject.get("cellPhone").getAsString();
                 Double value = jsonObject.get("value").getAsDouble();
 
-                return RechargeResponse.create(rechargeRepository.save(Recharge.create(message, transactionalID, cellPhone, value, request.getSupplierId())));
+                return RechargeResponse.create(rechargeRepository.save(Recharge.create(message, transactionalID, cellPhone, value, request.getSupplierId(), request.getOperator())));
 
             }
 

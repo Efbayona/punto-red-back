@@ -33,19 +33,23 @@ public class Recharge extends AuditEntity {
     @Column(name = "supplier_id", nullable = false)
     private String supplierId;
 
+    @Column(name = "operator", nullable = false)
+    private String operator;
+
     public Recharge() {
     }
 
-    public Recharge(String message, UUID transactionalID, String cellPhone, Double value, String supplierId) {
+    public Recharge(String message, UUID transactionalID, String cellPhone, Double value, String supplierId, String operator) {
         this.message = message;
         this.transactionalID = transactionalID;
         this.cellPhone = cellPhone;
         this.value = value;
         this.supplierId = supplierId;
+        this.operator = operator;
     }
 
-    public static Recharge create(String message, UUID transactionalID, String cellPhone, Double value, String supplierId) {
-        return new Recharge(message, transactionalID, cellPhone, value, supplierId);
+    public static Recharge create(String message, UUID transactionalID, String cellPhone, Double value, String supplierId, String operator) {
+        return new Recharge(message, transactionalID, cellPhone, value, supplierId, operator);
     }
 
 }

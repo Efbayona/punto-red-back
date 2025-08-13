@@ -13,6 +13,9 @@ public class RechargeRequest {
     @JsonProperty(value = "supplierId", required = true)
     private String supplierId;
 
+    @JsonProperty(value = "operator", required = true)
+    private String operator;
+
     @ValidatorPhone
     @JsonProperty(value = "cellPhone", required = true)
     private String cellPhone;

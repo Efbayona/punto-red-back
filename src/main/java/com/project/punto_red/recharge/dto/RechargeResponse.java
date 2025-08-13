@@ -22,17 +22,21 @@ public class RechargeResponse {
     @JsonProperty(value = "supplier_id")
     private String supplierId;
 
+    @JsonProperty(value = "operator")
+    private String operator;
+
     @JsonProperty(value = "transactional_id")
     private UUID transactionalId;
 
     @JsonProperty(value = "created_at")
     private LocalDateTime created_at;
 
-    public RechargeResponse(String message, String cellPhone, Double value, String supplierId, UUID transactionalId, LocalDateTime created_at) {
+    public RechargeResponse(String message, String cellPhone, Double value, String supplierId, String operator, UUID transactionalId, LocalDateTime created_at) {
         this.message = message;
         this.cellPhone = cellPhone;
         this.value = value;
         this.supplierId = supplierId;
+        this.operator = operator;
         this.transactionalId = transactionalId;
         this.created_at = created_at;
     }
@@ -43,6 +47,7 @@ public class RechargeResponse {
                 recharge.getCellPhone(),
                 recharge.getValue(),
                 recharge.getSupplierId(),
+                recharge.getOperator(),
                 recharge.getTransactionalID(),
                 recharge.getCreatedAt());
     }

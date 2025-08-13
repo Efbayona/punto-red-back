@@ -22,15 +22,19 @@ public class RechargeHistoryResponse {
     @JsonProperty(value = "supplier_id")
     private String supplierId;
 
+    @JsonProperty(value = "operator")
+    private String operator;
+
     @JsonProperty(value = "created_at")
     private LocalDateTime created_at;
 
-    public RechargeHistoryResponse(String message, String cellPhone, Double value, UUID transactionalId , String supplierId, LocalDateTime created_at) {
+    public RechargeHistoryResponse(String message, String cellPhone, Double value, UUID transactionalId, String supplierId, String operator, LocalDateTime created_at) {
         this.message = message;
         this.cellPhone = cellPhone;
         this.value = value;
         this.transactionalId = transactionalId;
         this.supplierId = supplierId;
+        this.operator = operator;
         this.created_at = created_at;
     }
 }
