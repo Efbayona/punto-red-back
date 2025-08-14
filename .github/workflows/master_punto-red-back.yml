@@ -49,5 +49,6 @@ jobs:
         with:
           app-name: 'punto-red-back'
           slot-name: 'Production'
-          package: '*.jar'
+          package: build/libs/*.jar
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_A777082068E943298B7D6494C3A4989E }}
+
