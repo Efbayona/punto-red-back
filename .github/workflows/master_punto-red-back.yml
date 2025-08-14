@@ -41,7 +41,7 @@ jobs:
     needs: build
     environment:
       name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+      url: '${{ github.workspace }}/target/*.jar'
     permissions:
       id-token: write #This is required for requesting the JWT
 
@@ -67,6 +67,7 @@ jobs:
           package: '*.jar'
 
           
+
 
 
 
