@@ -9,9 +9,9 @@ server:
 
 spring:
   datasource:
-    username: postgres
-    password: 123456
-    url: jdbc:postgresql://localhost:5432/punto-red
+    username: neondb_owner
+    password: npg_FLGMpdx2vDo9
+    url: jdbc:postgresql://ep-cold-water-ad7mx9n5.c-2.us-east-1.aws.neon.tech:5432/neondb?sslmode=require
   jpa:
     generate-ddl: true
     hibernate:
