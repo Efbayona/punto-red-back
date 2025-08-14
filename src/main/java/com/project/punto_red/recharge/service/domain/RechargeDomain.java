@@ -13,19 +13,21 @@ public class RechargeDomain {
     private final String supplierId;
 
     private final String cellPhone;
+    private final String operator;
 
     private final BigDecimal value;
 
-    private RechargeDomain(String supplierId, String cellPhone, BigDecimal value) {
+    private RechargeDomain(String supplierId, String cellPhone, String operator, BigDecimal value) {
         this.supplierId = supplierId;
         this.cellPhone = cellPhone;
+        this.operator = operator;
         this.value = value;
     }
 
-    public static RechargeDomain create(String supplierId, String cellPhone, BigDecimal value){
+    public static RechargeDomain create(String supplierId, String cellPhone, String operator,BigDecimal value){
         validateValue(value);
         validatePhoneNumber(cellPhone);
-        return new RechargeDomain(supplierId, cellPhone, value);
+        return new RechargeDomain(supplierId, cellPhone, operator, value);
     }
 
     private static void validateValue(BigDecimal value) {

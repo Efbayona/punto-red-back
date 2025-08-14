@@ -4,6 +4,7 @@ import com.project.punto_red.recharge.dto.RechargeHistoryResponse;
 import com.project.punto_red.recharge.dto.RechargeRequest;
 import com.project.punto_red.recharge.dto.RechargeResponse;
 import com.project.punto_red.recharge.service.RechargeService;
+import com.project.punto_red.recharge.service.domain.RechargeDomain;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -32,7 +34,8 @@ public class RechargeController {
             @ApiResponse(responseCode = "401", description = "CANT NOT RECHARGE")
     })
     public ResponseEntity<RechargeResponse> recharge(@Valid @RequestBody RechargeRequest request) {
-        return new ResponseEntity<>(rechargeService.recharge(request), HttpStatus.OK);
+        RechargeDomain rechargeDomain = RechargeDomain.create(request.getSupplierId(), request.getCellPhone(), request.getOperator(), BigDecimal.valueOf(request.getValue()));
+        return new ResponseEntity<>(rechargeService.recharge(rechargeDomain), HttpStatus.OK);
     }
 
     @GetMapping("/history")

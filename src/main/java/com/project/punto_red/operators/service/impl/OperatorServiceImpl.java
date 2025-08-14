@@ -20,19 +20,17 @@ public class OperatorServiceImpl implements OperatorService {
     @Value("${settings.request.url}")
     private String baseUrl;
     private final TokenStorage tokenStorage;
+    private final HttpClient httpClient;
 
-    public OperatorServiceImpl(TokenStorage tokenStorage) {
+    public OperatorServiceImpl(TokenStorage tokenStorage, HttpClient httpClient) {
         this.tokenStorage = tokenStorage;
+        this.httpClient = httpClient;
     }
 
     @Override
     public String getOperators() {
         try {
             String operatorsUrl = baseUrl + "/getSuppliers";
-
-            HttpClient client = HttpClient.newBuilder()
-                    .connectTimeout(Duration.ofSeconds(10))
-                    .build();
 
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .uri(URI.create(operatorsUrl))
@@ -42,7 +40,7 @@ public class OperatorServiceImpl implements OperatorService {
                     .GET()
                     .build();
 
-            HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
                 return response.body();

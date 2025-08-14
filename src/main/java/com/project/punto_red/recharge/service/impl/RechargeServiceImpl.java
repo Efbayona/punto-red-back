@@ -5,11 +5,11 @@ import com.google.gson.JsonObject;
 import com.project.punto_red.common.exception.service.ServerErrorException;
 import com.project.punto_red.common.util.TokenStorage;
 import com.project.punto_red.recharge.dto.RechargeHistoryResponse;
-import com.project.punto_red.recharge.dto.RechargeRequest;
 import com.project.punto_red.recharge.dto.RechargeResponse;
 import com.project.punto_red.recharge.entity.Recharge;
 import com.project.punto_red.recharge.repository.RechargeRepository;
 import com.project.punto_red.recharge.service.RechargeService;
+import com.project.punto_red.recharge.service.domain.RechargeDomain;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -33,15 +33,16 @@ public class RechargeServiceImpl implements RechargeService {
 
     private final TokenStorage tokenStorage;
     private final RechargeRepository rechargeRepository;
+    private final HttpClient httpClient;
 
-    public RechargeServiceImpl(TokenStorage tokenStorage, RechargeRepository rechargeRepository) {
+    public RechargeServiceImpl(TokenStorage tokenStorage, RechargeRepository rechargeRepository, HttpClient httpClient) {
         this.tokenStorage = tokenStorage;
         this.rechargeRepository = rechargeRepository;
+        this.httpClient = httpClient;
     }
 
     @Override
-    public RechargeResponse recharge(RechargeRequest request) {
-
+    public RechargeResponse recharge(RechargeDomain request) {
         Gson gson = new Gson();
 
         try {
@@ -53,15 +54,15 @@ public class RechargeServiceImpl implements RechargeService {
 
             String operatorsUrl = baseUrl + "/buy";
 
-            HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
-
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .uri(URI.create(operatorsUrl))
                     .timeout(Duration.ofSeconds(10))
                     .header("Content-Type", "application/json")
-                    .header("Authorization", tokenStorage.getToken()).POST(HttpRequest.BodyPublishers.ofString(jsonPayload)).build();
+                    .header("Authorization", tokenStorage.getToken())
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                    .build();
 
-            HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
                 String responseBody = response.body();
@@ -73,8 +74,15 @@ public class RechargeServiceImpl implements RechargeService {
                 String cellPhone = jsonObject.get("cellPhone").getAsString();
                 Double value = jsonObject.get("value").getAsDouble();
 
-                return RechargeResponse.create(rechargeRepository.save(Recharge.create(message, transactionalID, cellPhone, value, request.getSupplierId(), request.getOperator())));
-
+                return RechargeResponse.create(
+                        rechargeRepository.save(Recharge.create(
+                                message,
+                                transactionalID,
+                                cellPhone,
+                                value,
+                                request.getSupplierId(),
+                                request.getOperator()))
+                );
             }
 
         } catch (Exception e) {
