@@ -43,10 +43,8 @@ public class SecurityConfig {
                 .authenticationProvider(this.authenticationProvider())
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(registry -> {
-                    registry.requestMatchers("/v3/api-docs/**",
-                            "/swagger-ui/**",
-                            "/swagger-ui.html",
-                            "/secure/**").permitAll();
+                    registry.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+                    registry.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/secure/**").permitAll();
                     registry.requestMatchers(HttpMethod.GET, "/**").permitAll();
                     registry.requestMatchers(HttpMethod.POST, "/**").permitAll();
                     registry.anyRequest().authenticated();
